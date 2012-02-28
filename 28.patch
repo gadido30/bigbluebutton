@@ -1,0 +1,248 @@
+From 15eadfafde01c0d8894d2ec84ae6ee787b2120dc Mon Sep 17 00:00:00 2001
+From: Malek Tarboush <malek@smartway-me.com>
+Date: Tue, 28 Feb 2012 02:26:02 -0800
+Subject: [PATCH 1/7] Update
+ bigbluebutton-client/src/org/bigbluebutton/modules/chat/views/ChatView.mxml
+
+---
+ .../src/org/bigbluebutton/modules/chat/views/ChatView.mxml    |    9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/bigbluebutton-client/src/org/bigbluebutton/modules/chat/views/ChatView.mxml b/bigbluebutton-client/src/org/bigbluebutton/modules/chat/views/ChatView.mxml
+index f81732b..e7dd3bc 100755
+--- a/bigbluebutton-client/src/org/bigbluebutton/modules/chat/views/ChatView.mxml
++++ b/bigbluebutton-client/src/org/bigbluebutton/modules/chat/views/ChatView.mxml
+@@ -105,6 +105,7 @@
+ 			
+ 			[Bindable]
+ 			public var participants:ArrayCollection = new ArrayCollection();
++			private var rtlSelected:Boolean=false;
+ 			
+ 			private function onCreationComplete():void{
+ 				addParticipantToList(PUBLIC_CHAT_USERID, PUBLIC_CHAT_USERNAME, "public");
+@@ -232,6 +233,7 @@
+ 				publicEvent.message = parseURLs(cleanup(message));
+ 				publicEvent.color = cmpColorPicker.selectedColor.toString();
+ 				publicEvent.time = currentTime();
++				publicEvent.reverse = rtlSelected;
+ 				publicEvent.language = ResourceUtil.getInstance().getCurrentLanguageCode().split("_")[0];
+ 				globalDispatcher.dispatchEvent(publicEvent);
+ 			}
+@@ -247,6 +249,7 @@
+ 				privateEvent.toUser = chatTabs.selectedChild.name;
+ 				privateEvent.color = cmpColorPicker.selectedColor.toString();
+ 				privateEvent.time = currentTime();
++				privateEvent.reverse = rtlSelected;
+ 				privateEvent.language = ResourceUtil.getInstance().getCurrentLanguageCode().split("_")[0];
+ 				globalDispatcher.dispatchEvent(privateEvent);
+ 			}
+@@ -442,6 +445,11 @@
+ 			{
+ 				this.autoTranslation = e.translateOn;
+ 			}
++			
++			private function changeRTL():void
++			{
++				this.rtlSelected = rtlBox.selected;
++			}
+ 						
+ 		]]>
+ 	</mx:Script>
+@@ -450,6 +458,7 @@
+ 	
+ 	<mx:ApplicationControlBar id="chatCtrlBar" width="100%" height="10%">		
+ 		<mx:TextInput id="txtMsg" width="100%" enter="sendMessages()" color="{cmpColorPicker.selectedColor}"/>
++		<mx:CheckBox id="rtlBox" label="{ResourceUtil.getInstance().getString('bbb.quraanboard.arabic')}" click="changeRTL()"/>
+ 		<mx:ColorPicker id="cmpColorPicker" showTextField="false" toolTip="{ResourceUtil.getInstance().getString('bbb.chat.cmpColorPicker.toolTip')}" 
+ 						selectedColor="0x000000" dataProvider="{colorPickerColours}" swatchPanelStyleName="colorPickerStyle"/>
+ 		<mx:Button label="{ResourceUtil.getInstance().getString('bbb.chat.sendBtn')}" id="sendBtn" 
+-- 
+1.7.10
+
+
+From 9440c82aa604515f203df6eeb439edec38c0d46d Mon Sep 17 00:00:00 2001
+From: Malek Tarboush <malek@smartway-me.com>
+Date: Tue, 28 Feb 2012 02:26:53 -0800
+Subject: [PATCH 2/7] Update
+ bigbluebutton-client/src/org/bigbluebutton/modules/chat/events/SendPublicChatMessageEvent.as
+
+---
+ .../bigbluebutton/modules/chat/events/SendPublicChatMessageEvent.as   |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/bigbluebutton-client/src/org/bigbluebutton/modules/chat/events/SendPublicChatMessageEvent.as b/bigbluebutton-client/src/org/bigbluebutton/modules/chat/events/SendPublicChatMessageEvent.as
+index 67a4996..2101fe6 100755
+--- a/bigbluebutton-client/src/org/bigbluebutton/modules/chat/events/SendPublicChatMessageEvent.as
++++ b/bigbluebutton-client/src/org/bigbluebutton/modules/chat/events/SendPublicChatMessageEvent.as
+@@ -28,6 +28,7 @@ package org.bigbluebutton.modules.chat.events
+ 		public var time:String; // should be changed to timestamp
+ 		public var color:String;
+ 		public var language:String;
++		public var reverse:Boolean;
+ 		
+ 		public function SendPublicChatMessageEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=false)
+ 		{
+-- 
+1.7.10
+
+
+From ce57a3b173ad336745ffe5ef8b7212b13541d126 Mon Sep 17 00:00:00 2001
+From: Malek Tarboush <malek@smartway-me.com>
+Date: Tue, 28 Feb 2012 02:27:38 -0800
+Subject: [PATCH 3/7] Update
+ bigbluebutton-client/src/org/bigbluebutton/modules/chat/events/SendPrivateChatMessageEvent.as
+
+---
+ .../modules/chat/events/SendPrivateChatMessageEvent.as              |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/bigbluebutton-client/src/org/bigbluebutton/modules/chat/events/SendPrivateChatMessageEvent.as b/bigbluebutton-client/src/org/bigbluebutton/modules/chat/events/SendPrivateChatMessageEvent.as
+index ff4701a..c35fd1f 100755
+--- a/bigbluebutton-client/src/org/bigbluebutton/modules/chat/events/SendPrivateChatMessageEvent.as
++++ b/bigbluebutton-client/src/org/bigbluebutton/modules/chat/events/SendPrivateChatMessageEvent.as
+@@ -28,7 +28,8 @@ package org.bigbluebutton.modules.chat.events
+ 		public var time:String;
+ 		public var color:String;
+ 		public var language:String;
+-				
++	        public var reverse:Boolean;	
++
+ 		public function SendPrivateChatMessageEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
+ 		{
+ 			super(type, bubbles, cancelable);
+-- 
+1.7.10
+
+
+From 9ec904ea00b6c61cf5f209e1eab6f8c1da4e10e3 Mon Sep 17 00:00:00 2001
+From: Malek Tarboush <malek@smartway-me.com>
+Date: Tue, 28 Feb 2012 02:28:11 -0800
+Subject: [PATCH 4/7] Update
+ bigbluebutton-client/src/org/bigbluebutton/modules/chat/services/PublicChatService.as
+
+---
+ .../modules/chat/services/PublicChatService.as            |   13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/bigbluebutton-client/src/org/bigbluebutton/modules/chat/services/PublicChatService.as b/bigbluebutton-client/src/org/bigbluebutton/modules/chat/services/PublicChatService.as
+index b9bc59b..e8a8bdc 100755
+--- a/bigbluebutton-client/src/org/bigbluebutton/modules/chat/services/PublicChatService.as
++++ b/bigbluebutton-client/src/org/bigbluebutton/modules/chat/services/PublicChatService.as
+@@ -46,9 +46,18 @@ package org.bigbluebutton.modules.chat.services
+ 			chatSOService.getChatTranscript();
+ 		}
+ 		
+-		public function sendChatMessageEvent(event:SendPublicChatMessageEvent):void {
++			public function sendChatMessageEvent(event:SendPublicChatMessageEvent):void {
+ 			trace("Receive receivedSendPublicChatMessageEvent");
+-			chatSOService.sendMessage(event.message,attributes.username,event.color,event.time,event.language,attributes.userid);
++			var newMessage:String;
++			newMessage =  event.message;
++			if(event.reverse){
++				var arStr:Array = event.message.split(" ");
++				for (var i:int = ( arStr.length - 1 ); i > -1; i--) 
++				{
++					newMessage+=" "+arStr[i];
++				}
++			}
++			chatSOService.sendMessage(newMessage,attributes.username,event.color,event.time,event.language,attributes.userid);
+ 		}
+ 	}
+ }
+\ No newline at end of file
+-- 
+1.7.10
+
+
+From cbbc2d0bd60fdeeeaab6434502aaec48433efb1d Mon Sep 17 00:00:00 2001
+From: Malek Tarboush <malek@smartway-me.com>
+Date: Tue, 28 Feb 2012 02:29:37 -0800
+Subject: [PATCH 5/7] Update
+ bigbluebutton-client/src/org/bigbluebutton/modules/chat/services/PrivateChatService.as
+
+---
+ .../modules/chat/services/PrivateChatService.as          |   14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/bigbluebutton-client/src/org/bigbluebutton/modules/chat/services/PrivateChatService.as b/bigbluebutton-client/src/org/bigbluebutton/modules/chat/services/PrivateChatService.as
+index 99f3be2..e3a3a86 100755
+--- a/bigbluebutton-client/src/org/bigbluebutton/modules/chat/services/PrivateChatService.as
++++ b/bigbluebutton-client/src/org/bigbluebutton/modules/chat/services/PrivateChatService.as
+@@ -51,8 +51,7 @@ package org.bigbluebutton.modules.chat.services
+ 		
+ 		public function sendChatMessageEvent(event:SendPrivateChatMessageEvent):void {
+ 			trace("Receive receivedSendPrivateChatMessageEvent");
+-			/*newMessage = "<font color=\"#" + event.color + "\"><b>[" + 
+-						attributes.username +" - "+ event.time + "]</b> " + event.message + "</font><br/>";*/
++
+ 			var chatobj:ChatObject = new ChatObject();
+ 			chatobj.message = event.message;
+ 			chatobj.username = attributes.username;
+@@ -61,6 +60,17 @@ package org.bigbluebutton.modules.chat.services
+ 			chatobj.language = event.language;
+ 			chatobj.userid = attributes.userid;
+ 			
++			var newMessage:String  = event.message;
++			if(event.reverse){
++				var arStr:Array = event.message.split(" ");
++				newMessage = "";
++				for (var i:int = ( arStr.length - 1 ); i > -1; i--) 
++				{
++					newMessage+=" "+arStr[i];
++				}
++			}
++			
++			chatobj.message = newMessage;
+ 			var messageVO:MessageVO = new MessageVO(chatobj, attributes.userid, event.toUser);
+ 			
+ 			chatSOService.sendMessage(messageVO);
+-- 
+1.7.10
+
+
+From e858a589cb04439169524367a4cf56d1f3b86848 Mon Sep 17 00:00:00 2001
+From: Malek Tarboush <malek@smartway-me.com>
+Date: Tue, 28 Feb 2012 05:16:14 -0800
+Subject: [PATCH 6/7] Update
+ bigbluebutton-client/locale/ar_SY/bbbResources.properties
+
+---
+ bigbluebutton-client/locale/ar_SY/bbbResources.properties |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/bigbluebutton-client/locale/ar_SY/bbbResources.properties b/bigbluebutton-client/locale/ar_SY/bbbResources.properties
+index fc13661..40718a5 100644
+--- a/bigbluebutton-client/locale/ar_SY/bbbResources.properties
++++ b/bigbluebutton-client/locale/ar_SY/bbbResources.properties
+@@ -166,4 +166,5 @@ bbb.settings.noissues = No outstanding issues have been detected.
+ bbb.settings.instructions = Accept the Flash prompt that asks you for camera permissions. If you can see yourself and  hear yourself, your browser has been set up correctly. Other potentials issues are shown bellow. Click on each to find a possible solution.
+ bbb.videodock.title = Video dock
+ bbb.zzzzz.yyyy = 
++bbb.quraanboard.arabic=عربي
+  = 
+-- 
+1.7.10
+
+
+From 6fbe421e49bfe83c3d11823279b89bad4e8f8406 Mon Sep 17 00:00:00 2001
+From: Malek Tarboush <malek@smartway-me.com>
+Date: Tue, 28 Feb 2012 05:17:10 -0800
+Subject: [PATCH 7/7] Update
+ bigbluebutton-client/locale/en_US/bbbResources.properties
+
+---
+ bigbluebutton-client/locale/en_US/bbbResources.properties |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/bigbluebutton-client/locale/en_US/bbbResources.properties b/bigbluebutton-client/locale/en_US/bbbResources.properties
+index e10c6cc..02d9417 100755
+--- a/bigbluebutton-client/locale/en_US/bbbResources.properties
++++ b/bigbluebutton-client/locale/en_US/bbbResources.properties
+@@ -165,3 +165,4 @@ bbb.settings.warning.close = Close this Warning
+ bbb.settings.noissues = No outstanding issues have been detected.
+ bbb.settings.instructions = Accept the Flash prompt that asks you for camera permissions. If you can see yourself and  hear yourself, your browser has been set up correctly. Other potentials issues are shown bellow. Click on each to find a possible solution.
+ bbb.videodock.title = Video dock
++bbb.quraanboard.arabic=Arabic
+-- 
+1.7.10
+
